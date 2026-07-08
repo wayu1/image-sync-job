@@ -1,0 +1,45 @@
+name: Sync ACR Image To DockerHub
+# 支持手动点击触发，无需提交代码
+on:
+  workflow_dispatch:
+
+jobs:
+  sync-image:
+    runs-on: ubuntu-latest # 海外服务器，天然直连docker.io，不用VPN
+    steps:
+      # 1. 安装docker环境
+      - name: Setup Docker
+        uses: docker/setup-buildx-action@v3
+
+      # 2. 登录阿里云个人ACR
+      - name: Login Aliyun ACR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.ALIYUN_REG }}
+          username: ${{ secrets.ALIYUN_USER }}
+          password: ${{ secrets.ALIYUN_PWD }}
+
+      # 3. 拉取阿里云镜像 + 打DockerHub标签
+      - name: Pull & Retag Image
+        run: |
+          # 源镜像：你的阿里云镜像
+          SOURCE_IMG="${{ secrets.ALIYUN_REG }}/avatar007/python:3.12.0-slim"
+          # 目标镜像：替换【你的DH用户名】
+          TARGET_IMG="docker.io/wayoj007/python:3.12.0-slim"
+
+          docker pull $SOURCE_IMG
+          docker tag $SOURCE_IMG $TARGET_IMG
+
+      # 4. 登录Docker Hub
+      - name: Login DockerHub
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ secrets.DH_USER }}
+          password: ${{ secrets.DH_PWD }}
+
+      # 5. 推送镜像到DockerHub
+      - name: Push To DockerHub
+        run: |
+          TARGET_IMG="docker.io/你的DH用户名/python:3.12.0-slim"
+          docker push $TARGET_IMG
