@@ -23,9 +23,9 @@ jobs:
       - name: Pull & Retag Image
         run: |
           # 源镜像：你的阿里云镜像
-          SOURCE_IMG="${{ secrets.ALIYUN_REG }}/avatar007/python:3.12.0-slim"
+          SOURCE_IMG="${{ secrets.ALIYUN_REG }}/avatar007/kokoro:v0.5.0"
           # 目标镜像：替换【你的DH用户名】
-          TARGET_IMG="docker.io/wayoj007/python:3.12.0-slim"
+          TARGET_IMG="docker.io/wayoj007/kokoro-gpu:v0.5.0"
 
           docker pull $SOURCE_IMG
           docker tag $SOURCE_IMG $TARGET_IMG
@@ -41,5 +41,5 @@ jobs:
       # 5. 推送镜像到DockerHub
       - name: Push To DockerHub
         run: |
-          TARGET_IMG="docker.io/wayoj007/python:3.12.0-slim"
+          TARGET_IMG="docker.io/wayoj007/kokoro:v0.5.0"
           docker push $TARGET_IMG
