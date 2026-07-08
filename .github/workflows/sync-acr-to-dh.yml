@@ -41,5 +41,5 @@ jobs:
       # 5. 推送镜像到DockerHub
       - name: Push To DockerHub
         run: |
-          TARGET_IMG="docker.io/wayoj007/kokoro:v0.5.0"
+          TARGET_IMG="docker.io/wayoj007/kokoro-gpu:v0.5.0"
           docker push $TARGET_IMG
