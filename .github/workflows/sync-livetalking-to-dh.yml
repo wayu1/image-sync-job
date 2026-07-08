@@ -1,4 +1,4 @@
-name: ACR同步DockerHub-Skopeo稳定版
+name: ACR同步DockerHub-Skopeo
 on:
   workflow_dispatch:
 jobs:
