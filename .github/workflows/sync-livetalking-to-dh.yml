@@ -1,45 +1,32 @@
 name: ACR大镜像流式同步DockerHub(无本地缓存)
 on:
-  workflow_dispatch: # 手动触发
+  workflow_dispatch:
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      # 清理磁盘，腾出更多空间
       - name: Clean disk space
         run: |
           sudo rm -rf /usr/share/dotnet /opt/ghc /opt/hostedtoolcache
           sudo apt clean
           df -h
 
-      # 安装skopeo，点对点复制，不完整下载镜像到机器
       - name: Install skopeo
         run: sudo apt update && sudo apt install -y skopeo
 
-      # 写入双仓库登录凭证
-      - name: Config registry auth
+      - name: Sync image
         env:
-          ALI_REG: ${{ secrets.ALIYUN_REG }}
+          ALI_USER: ${{ secrets.ALIYUN_USER }}
+          ALI_PWD: ${{ secrets.ALIYUN_PWD }}
           DH_USER: ${{ secrets.DH_USER }}
           DH_PWD: ${{ secrets.DH_PWD }}
-        run: |
-          mkdir -p ~/.containers
-          ALI_CRED=$(echo -n "${{ secrets.ALIYUN_USER }}:${{ secrets.ALIYUN_PWD }}" | base64 -w0)
-          DH_CRED=$(echo -n "$DH_USER:$DH_PWD" | base64 -w0)
-          cat > ~/.containers/auth.json << EOF
-          {
-            "auths": {
-              "$ALI_REG": {"auth": "$ALI_CRED"},
-              "docker.io": {"auth": "$DH_CRED"}
-            }
-          }
-          EOF
-
-      # 核心同步命令，一层一层流转，无本地完整镜像
-      - name: Sync image
         run: |
           SOURCE="crpi-a0029cb4opg2q16u.cn-hangzhou.personal.cr.aliyuncs.com/livetalking/livetalking-gpu:v1.0.0"
           TARGET="docker.io/wayoj007/livetalking-gpu:v1.0.0"
           echo "开始同步：$SOURCE ==> $TARGET"
-          skopeo copy --all --retry-times=3 docker://$SOURCE docker://$TARGET
+          skopeo copy \
+            --retry-times=3 \
+            --src-creds "$ALI_USER:$ALI_PWD" \
+            --dest-creds "$DH_USER:$DH_PWD" \
+            docker://$SOURCE docker://$TARGET
           echo "同步完成"
