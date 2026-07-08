@@ -1,38 +1,62 @@
-name: ACR同步DockerHub-Skopeo稳定版
+name: ACR同步DockerHub-Skopeo修复版
 on:
   workflow_dispatch
 jobs:
   sync:
     runs-on: ubuntu-latest
-    env:
-      ALI_REG: crpi-a0029cb4opg2q16u.cn-hangzhou.personal.cr.aliyuncs.com
-      ALI_USER: ${{ secrets.ALIYUN_USER }}
-      ALI_PWD: ${{ secrets.ALIYUN_PWD }}
-      DH_USER: ${{ secrets.DH_USER }}
-      DH_PWD: ${{ secrets.DH_PWD }}
     steps:
-      - name: 清理磁盘空间
+      - name: 清理磁盘
         run: |
           sudo rm -rf /usr/share/dotnet /opt/ghc /opt/hostedtoolcache
           sudo apt clean
-          df -h
 
-      - name: 安装Skopeo
+      - name: 安装skopeo
         run: sudo apt update && sudo apt install -y skopeo
 
-      - name: 镜像同步
+      - name: 镜像搬运
+        env:
+          ALI_USER: ${{ secrets.ALIYUN_USER }}
+          ALI_PWD: ${{ secrets.ALIYUN_PWD }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_PWD: ${{ secrets.DH_PWD }}
         run: |
-          SOURCE="${ALI_REG}/livetalking/livetalking-gpu:v1.0.0"
-          TARGET="docker.io/${DH_USER}/livetalking-gpu:v1.0.0"
-          echo "源镜像: $SOURCE"
-          echo "目标镜像: $TARGET"
-          
+          # 固定完整地址，不会换行断裂
           skopeo copy \
             --retry-times=5 \
             --remove-signatures \
             --src-creds "${ALI_USER}:${ALI_PWD}" \
             --dest-creds "${DH_USER}:${DH_PWD}" \
-            docker://$SOURCE \
-            docker://$TARGET
-          
-          echo "===== 镜像同步完成 ====="
+            docker://crpi-a0029cb4opg2q16u.cn-hangzhou.personal.cr.aliyuncs.com/livetalking/livetalking-gpu:v1.0.0 \
+            docker://wayoj007/livetalking-gpu:v1.0.0
+          echo "同步完成"
+name: ACR同步DockerHub-Skopeo修复版
+on:
+  workflow_dispatch
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 清理磁盘
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /opt/hostedtoolcache
+          sudo apt clean
+
+      - name: 安装skopeo
+        run: sudo apt update && sudo apt install -y skopeo
+
+      - name: 镜像搬运
+        env:
+          ALI_USER: ${{ secrets.ALIYUN_USER }}
+          ALI_PWD: ${{ secrets.ALIYUN_PWD }}
+          DH_USER: ${{ secrets.DH_USER }}
+          DH_PWD: ${{ secrets.DH_PWD }}
+        run: |
+          # 固定完整地址，不会换行断裂
+          skopeo copy \
+            --retry-times=5 \
+            --remove-signatures \
+            --src-creds "${ALI_USER}:${ALI_PWD}" \
+            --dest-creds "${DH_USER}:${DH_PWD}" \
+            docker://crpi-a0029cb4opg2q16u.cn-hangzhou.personal.cr.aliyuncs.com/livetalking/livetalking-gpu:v1.0.0 \
+            docker://wayoj007/livetalking-gpu:v1.0.0
+          echo "同步完成"
