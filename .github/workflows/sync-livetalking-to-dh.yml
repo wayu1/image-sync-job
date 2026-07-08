@@ -22,18 +22,18 @@ jobs:
 
       - name: 镜像同步
         run: |
-          SOURCE="${{ env.ALI_REG }}/livetalking/livetalking-gpu:v1.0.0"
-          TARGET="docker.io/${{ env.DH_USER }}/livetalking-gpu:v1.0.0"
+          SOURCE="${ALI_REG}/livetalking/livetalking-gpu:v1.0.0"
+          TARGET="docker.io/${DH_USER}/livetalking-gpu:v1.0.0"
           echo "源镜像: $SOURCE"
           echo "目标镜像: $TARGET"
           
           skopeo copy \
             --retry-times=5 \
             --remove-signatures \
-            --src-creds "${{ env.ALI_USER }}:${{ env.ALI_PWD }}" \
-            --dest-creds "${{ env.DH_USER }}:${{ env.DH_PWD }}" \
-            docker://"$SOURCE" \
-            docker://"$TARGET"
+            --src-creds "${ALI_USER}:${ALI_PWD}" \
+            --dest-creds "${DH_USER}:${DH_PWD}" \
+            docker://$SOURCE \
+            docker://$TARGET
           
           echo "===== 镜像同步完成 ====="
 name: ACR同步DockerHub-Skopeo稳定版
@@ -60,17 +60,17 @@ jobs:
 
       - name: 镜像同步
         run: |
-          SOURCE="${{ env.ALI_REG }}/livetalking/livetalking-gpu:v1.0.0"
-          TARGET="docker.io/${{ env.DH_USER }}/livetalking-gpu:v1.0.0"
+          SOURCE="${ALI_REG}/livetalking/livetalking-gpu:v1.0.0"
+          TARGET="docker.io/${DH_USER}/livetalking-gpu:v1.0.0"
           echo "源镜像: $SOURCE"
           echo "目标镜像: $TARGET"
           
           skopeo copy \
             --retry-times=5 \
             --remove-signatures \
-            --src-creds "${{ env.ALI_USER }}:${{ env.ALI_PWD }}" \
-            --dest-creds "${{ env.DH_USER }}:${{ env.DH_PWD }}" \
-            docker://"$SOURCE" \
-            docker://"$TARGET"
+            --src-creds "${ALI_USER}:${ALI_PWD}" \
+            --dest-creds "${DH_USER}:${DH_PWD}" \
+            docker://$SOURCE \
+            docker://$TARGET
           
           echo "===== 镜像同步完成 ====="
