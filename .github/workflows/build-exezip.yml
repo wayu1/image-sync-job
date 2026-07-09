@@ -5,18 +5,18 @@ on:
     branches: [ main ]
     paths:
       - 'Dockerfile'
-      - 'Docker Desktop Installer.zip'
+      - 'Docker-Desktop-Installer.zip'
 
 jobs:
   build_push:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout repository code
         uses: actions/checkout@v4
 
-      # 调试：打印目录文件，确认Dockerfile和zip存在
-      - name: List workspace files
-        run: ls -la
+      # 调试打印文件列表，看是否检出成功
+      - name: Show all files in root
+        run: ls -la ./
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -29,8 +29,7 @@ jobs:
           username: ${{ secrets.DH_USER }}
           password: ${{ secrets.DH_PWD }}
 
-      # 构建镜像并推送至docker.io/wayoj007/build-exezip:v0.0.1
-      - name: Build and push image
+      - name: Build & Push image
         run: |
           IMAGE_NAME="wayoj007/build-exezip:v0.0.1"
           docker build -t "$IMAGE_NAME" .
